@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "gandalf-linkedin"
+version = "0.1.0"
+description = "A Python package for Gandalf's professional networking needs"
+authors = ["Luc EBERT <l.ebert@yahoo.fr>"]
+readme = "README.md"
+packages = [{include = "gandalf_linkedin"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+python-dotenv = "^1.0.0"
+requests = "^2.31.0"
+openai = "^1.12.0"
+linkedin-api = "^2.0.3"
+pydantic = "^2.6.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+ruff = "^0.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Basic linting rules
+select = ["E", "F", "I"]  # pycodestyle, Pyflakes, and isort
+line-length = 88
+target-version = "py38"
+fix = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
