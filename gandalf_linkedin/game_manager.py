@@ -24,6 +24,10 @@ class GameManager:
                 comment_text = message.get('text', '')
                 comment_urn = comment.get('$URN')
                 
+                # Skip if we've already responded to this comment
+                if self.linkedin.has_responded_to_comment(comment_urn):
+                    continue
+                
                 # Only respond if the user has liked the post
                 if self.linkedin.has_user_liked(user_id):
                     response = self.llm.generate_response(comment_text)
@@ -32,6 +36,7 @@ class GameManager:
                         parent_comment_urn=comment_urn
                     ):
                         self.linkedin.add_user_comment(user_id)
+                        self.linkedin.mark_comment_as_responded(comment_urn)
                     
         except Exception as e:
             print(f"Error processing comments: {e}") 

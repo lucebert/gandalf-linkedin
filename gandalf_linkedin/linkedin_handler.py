@@ -10,6 +10,7 @@ class LinkedInHandler:
     def __init__(self, activity_id: str):
         self.commented_users = set()
         self.liked_users = set()
+        self.responded_comments = set()  # Store URNs of comments we've responded to
         self.linkedin_api_url = f"https://api.linkedin.com/v2/socialActions/urn:li:activity:{activity_id}"
         self.headers = {
             "Authorization": f"Bearer {config.LINKEDIN_ACCESS_TOKEN}",
@@ -137,3 +138,11 @@ class LinkedInHandler:
     def add_user_comment(self, user_id: str):
         """Mark a user as having commented."""
         self.commented_users.add(user_id) 
+
+    def has_responded_to_comment(self, comment_urn: str) -> bool:
+        """Check if we've already responded to a specific comment."""
+        return comment_urn in self.responded_comments
+    
+    def mark_comment_as_responded(self, comment_urn: str):
+        """Mark a comment as having been responded to."""
+        self.responded_comments.add(comment_urn) 
