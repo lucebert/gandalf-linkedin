@@ -25,11 +25,7 @@ class GameManager:
                 comment_urn = comment.get('$URN')
                 
                 # Only respond if the user has liked the post
-                # and hasn't been responded to yet
-                if (
-                    self.linkedin.has_user_liked(user_id)
-                    and not self.linkedin.has_user_commented(user_id)
-                ):
+                if self.linkedin.has_user_liked(user_id):
                     response = self.llm.generate_response(comment_text)
                     if self.linkedin.post_comment(
                         f"🧙‍♂️𝘎𝘢𝘯𝘥𝘢𝘭𝘧 \n{response}",
