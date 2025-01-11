@@ -78,6 +78,7 @@ class LinkedInHandler:
             
             self.total_comments = api_total_comments
         
+        print(f"retreiving comments: {comments}")
         return comments
     
     def post_comment(self, comment_text: str, parent_comment_urn: str = None) -> bool:

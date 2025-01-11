@@ -17,7 +17,6 @@ class LLMHandler:
         Generate a response using the LLM based on user input.
         """
         print(f"Generating response for user input: {user_input}")
-        print(config.LLM_MODEL)
 
         try:
             response: ChatCompletion = self.client.chat.completions.create(
