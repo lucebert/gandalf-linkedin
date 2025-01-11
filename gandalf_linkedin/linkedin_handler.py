@@ -21,18 +21,41 @@ class LinkedInHandler:
     def update_liked_users(self) -> List[str]:
         """Fetch people who liked the LinkedIn post using the LinkedIn API."""
         api_url = f"{self.linkedin_api_url}/likes"
+        all_liked_users = []
 
         response = requests.get(api_url, headers=self.headers)
-        
         response.raise_for_status()
-        
         data = response.json()
         
+        # Get users from first page
         liked_users = [element["actor"] for element in data.get("elements", [])]
-        # Update the set of users who liked the post
-        self.liked_users.update(liked_users)
+        all_liked_users.extend(liked_users)
+
+        # Handle pagination if there are more pages
+        current_data = data
+        while "paging" in current_data and "links" in current_data["paging"]:
+            next_link = None
+            for link in current_data["paging"]["links"]:
+                if link.get("rel") == "next":
+                    next_link = link.get("href")
+                    break
+            
+            if not next_link:
+                break
+            
+            # The next_link is relative, so we need to construct the full URL
+            next_url = f"https://api.linkedin.com{next_link}"
+            response = requests.get(next_url, headers=self.headers)
+            response.raise_for_status()
+            
+            current_data = response.json()
+            liked_users = [element["actor"] for element in current_data.get("elements", [])]
+            all_liked_users.extend(liked_users)
         
-        return liked_users
+        # Update the set of users who liked the post
+        self.liked_users.update(all_liked_users)
+        
+        return all_liked_users
 
 
     def get_post_comments(self) -> List[Dict]:
