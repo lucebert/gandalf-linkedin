@@ -16,13 +16,13 @@ def main():
     while True:
         try:
             game.process_new_comments()
-            time.sleep(60)  # Check for new comments every minute
+            time.sleep(300)  # Check for new comments every minute
         except KeyboardInterrupt:
             print("\nShutting down gracefully...")
             break
         except Exception as e:
             print(f"Error in main loop: {e}")
-            time.sleep(60)  # Wait before retrying
+            time.sleep(300)  # Wait before retrying
 
 if __name__ == "__main__":
     main() 

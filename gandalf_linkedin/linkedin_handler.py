@@ -1,4 +1,5 @@
 from typing import Dict, List
+import math
 
 import requests
 
@@ -15,6 +16,7 @@ class LinkedInHandler:
             "Content-Type": "application/json",
             "LinkedIn-Version": "202409"
         }
+        self.total_comments = 0
 
     def update_liked_users(self) -> List[str]:
         """Fetch people who liked the LinkedIn post using the LinkedIn API."""
@@ -34,16 +36,49 @@ class LinkedInHandler:
 
 
     def get_post_comments(self) -> List[Dict]:
-        """Fetch comments from the LinkedIn post using the LinkedIn API."""
+        """Fetch comments from the LinkedIn post using the LinkedIn API.
+        Fetches additional pages if there are more comments than previously known.
+        """
         api_url = f"{self.linkedin_api_url}/comments"
         
         response = requests.get(api_url, headers=self.headers)
-        
         response.raise_for_status()
-        
         data = response.json()
-
-        return data.get("elements", [])
+        
+        comments = data.get("elements", [])
+        
+        # Check if we need to fetch more pages based on total comments
+        if "paging" in data and "total" in data["paging"]:
+            api_total_comments = data["paging"]["total"]
+            
+            # If we have more comments than we knew about
+            if api_total_comments > self.total_comments:
+                pages_to_fetch = math.ceil((api_total_comments - self.total_comments) / 10)
+                
+                # Fetch additional pages if needed
+                current_data = data
+                for _ in range(pages_to_fetch - 1):  # -1 because we already have first page
+                    next_link = None
+                    if "paging" in current_data and "links" in current_data["paging"]:
+                        for link in current_data["paging"]["links"]:
+                            if link.get("rel") == "next":
+                                next_link = link.get("href")
+                                break
+                    
+                    if not next_link:
+                        break
+                    
+                    # The next_link is relative, so we need to construct the full URL
+                    next_url = f"https://api.linkedin.com{next_link}"
+                    response = requests.get(next_url, headers=self.headers)
+                    response.raise_for_status()
+                    
+                    current_data = response.json()
+                    comments.extend(current_data.get("elements", []))
+            
+            self.total_comments = api_total_comments
+        
+        return comments
     
     def post_comment(self, comment_text: str, parent_comment_urn: str = None) -> bool:
         """Post a comment to the LinkedIn post or as a reply to another comment."""
