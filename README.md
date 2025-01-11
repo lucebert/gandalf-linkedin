@@ -2,6 +2,8 @@
 
 A LinkedIn-based LLM jailbreak game where users attempt to bypass Gandalf's system prompt through comments on a LinkedIn post.
 
+Inspired from the great [Gandalf Lakera](https://gandalf.lakera.ai/baseline)
+
 ![Gandalf LinkedIn Bot](image.png)
 
 ## Overview
